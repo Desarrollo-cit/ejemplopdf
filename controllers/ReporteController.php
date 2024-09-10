@@ -26,6 +26,7 @@ class ReporteController
         ]);
         $mpdf->AliasNbPages('[pagetotal]');
         $css = $router->load('pdf/styles');
+        $css = file_get_contents(__DIR__ . '/../views/pdf/styles.css');
         $header = $router->load('pdf/header');
         $footer = $router->load('pdf/footer');
         $mpdf->SetHTMLHeader($header);
