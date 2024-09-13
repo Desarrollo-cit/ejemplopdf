@@ -20,7 +20,7 @@ class EmailController
             ]
         ];
         try {
-            // $email->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+            $email->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
             $email->isSMTP();                                            //Send using SMTP
             $email->Host = $_ENV['MAIL_HOST'];                     //Set the SMTP server to send through
             $email->SMTPAuth = true;                                   //Enable SMTP authentication
