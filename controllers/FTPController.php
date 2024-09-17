@@ -2,6 +2,8 @@
 
 namespace Controllers;
 use Exception;
+use Model\ActiveRecord;
+use Model\Producto;
 use MVC\Router;
 use phpseclib3\Net\SFTP;
 
@@ -13,13 +15,19 @@ class FTPController
     }
     public static function subirAPI()
     {
-        // $_POST;
-        // $_GET;
-        // $_REQUEST;
-        // $_SERVER;
-        // $_ENV;
+        $db = Producto::getDB();
+
+        $db->beginTransaction();
         $files = $_FILES['archivo'];
         try {
+
+            $producto = new Producto([
+                'nombre' => "prueba",
+                'precio' => 500
+            ]);
+
+            $producto->crear();
+
             $ftpServer = $_ENV['FILE_SERVER'];
             $ftpUsername = $_ENV['FILE_USER'];
             $ftpPassword = $_ENV['FILE_PASSWORD'];
@@ -52,12 +60,16 @@ class FTPController
             $sftp->disconnect();
 
 
+            $db->rollBack();
+
         } catch (Exception $e) {
             echo json_encode([
                 'codigo' => 0,
                 'mensaje' => 'Error subiendo archivo',
                 'detalle'
             ]);
+
+            $db->rollBack();
         }
     }
 
