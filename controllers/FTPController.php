@@ -55,7 +55,7 @@ class FTPController
         } catch (Exception $e) {
             echo json_encode([
                 'codigo' => 0,
-                'mensaje' => 'Error mostrando archivo',
+                'mensaje' => 'Error subiendo archivo',
                 'detalle'
             ]);
         }
@@ -82,5 +82,60 @@ class FTPController
             ]);
         }
         echo json_encode($ruta);
+    }
+
+    public static function mostrarLocal()
+    {
+        $ruta = __DIR__ . '/../storage/66e9e71176e1a.pdf';
+        if (file_exists($ruta)) {
+            $mimeType = mime_content_type($ruta);
+            $fileData = file_get_contents($ruta);
+            $base64 = base64_encode($fileData);
+            $dataUrl = 'data:' . $mimeType . ';base64,' . $base64;
+
+            echo '<iframe src="' . $dataUrl . '" width="100%" height="600px"></iframe>';
+        } else {
+            echo "El archivo no existe.";
+        }
+    }
+
+    public static function mostrar()
+    {
+        try {
+            $ftpServer = $_ENV['FILE_SERVER'];
+            $ftpUsername = $_ENV['FILE_USER'];
+            $ftpPassword = $_ENV['FILE_PASSWORD'];
+            $remoteFilePath = $_ENV['FILE_DIR'];
+
+            $sftp = new SFTP($ftpServer);
+            $conectado = $sftp->login($ftpUsername, $ftpPassword);
+
+            if (!$conectado) {
+                throw new Exception('No se pudo conectar', 500);
+            }
+
+            $ruta = $remoteFilePath . "66e9e4e91bd10.pdf";
+
+            $fileData = $sftp->get($ruta);
+
+            // $mimeType = mime_content_type($fileData);
+
+
+            if ($fileData != false) {
+                $base64 = base64_encode($fileData);
+                $dataUrl = 'data:' . "application/pdf" . ';base64,' . $base64;
+
+                echo '<iframe src="' . $dataUrl . '" width="100%" height="600px"></iframe>';
+            } else {
+                throw new Exception('No se pudo obtener el archivo', 500);
+            }
+
+        } catch (Exception $e) {
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error mostrando archivo',
+                'detalle'
+            ]);
+        }
     }
 }
